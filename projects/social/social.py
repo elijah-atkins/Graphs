@@ -1,5 +1,6 @@
 import random
 import math
+from collections import deque
 
 class User:
     def __init__(self, name):
@@ -55,6 +56,7 @@ class SocialGraph:
             for friend_id in range(user_id + 1, self.last_id +1):
                 possible_friendships.append((user_id, friend_id))
         #shuffle that list
+        random.shuffle(possible_friendships)
         #create friendships using add_friendship from the first N elements in that list
         for i in range(math.floor(num_users * avg_friendships/2)):
             friendship = possible_friendships[i]
@@ -70,6 +72,33 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+
+        # Breadth first search to store shortest paths
+        path_queue = deque()
+        path_queue.append([user_id])
+
+        while len(path_queue) > 0:
+            path = path_queue.popleft()
+            friend_id = path[-1]
+
+            if friend_id in visited:
+                continue
+                
+            visited[friend_id] = path
+
+            #Enqueue Friends
+            for id in self.friendships([friend_id]):
+                new_path = path.copy
+                new_path.append(id)
+                path_queue.append(new_path)
+        
+        #figure out the number of friends/number of total users -1 to get percentage of users connected
+
+
+        #figure average of path lengths to get average degrees of separation
+
+
+
         return visited
 
 
