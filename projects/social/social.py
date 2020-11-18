@@ -1,6 +1,6 @@
 import random
-import math
-from collections import deque
+from random import randint
+import collections
 
 class User:
     def __init__(self, name):
@@ -36,31 +36,39 @@ class SocialGraph:
         """
         Takes a number of users and an average number of friendships
         as arguments
-
+​
         Creates that number of users and a randomly distributed friendships
         between those users.
-
+​
         The number of users must be greater than the average number of friendships.
         """
         # Reset graph
         self.last_id = 0
         self.users = {}
         self.friendships = {}
+        
         # Add users
         for i in range(num_users):
             self.add_user(f"User {i}")
+        
         # Create friendships
-        #generate all the possible fiendships and put them in a list
         possible_friendships = []
+        
         for user_id in self.users:
-            for friend_id in range(user_id + 1, self.last_id +1):
+            for friend_id in range(user_id + 1, self.last_id + 1):
                 possible_friendships.append((user_id, friend_id))
-        #shuffle that list
+
+        # Shuffle the possible friendships
         random.shuffle(possible_friendships)
-        #create friendships using add_friendship from the first N elements in that list
-        for i in range(math.floor(num_users * avg_friendships/2)):
+        
+        # Add friendships
+        for i in range(num_users * avg_friendships // 2):
             friendship = possible_friendships[i]
             self.add_friendship(friendship[0], friendship[1])
+
+    
+
+
     def get_all_social_paths(self, user_id):
         """
         Takes a user's user_id as an argument
@@ -71,10 +79,11 @@ class SocialGraph:
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
 
-        # Breadth first search to store shortest paths
-        path_queue = deque()
+        # Breadth first search since we want to store shortest paths
+
+        path_queue = collections.deque()
+
         path_queue.append([user_id])
 
         while len(path_queue) > 0:
@@ -83,28 +92,38 @@ class SocialGraph:
 
             if friend_id in visited:
                 continue
-                
+            
             visited[friend_id] = path
 
-            #Enqueue Friends
-            for id in self.friendships([friend_id]):
-                new_path = path.copy
+            #Enqueue friends
+            for id in self.friendships[friend_id]:
+                new_path = path.copy()
                 new_path.append(id)
                 path_queue.append(new_path)
-        
-        #figure out the number of friends/number of total users -1 to get percentage of users connected
 
+        # Figure out the number of friends / number of total users -1 to get percentage of users connected
+        friend_coverage = (len(visited) - 1) / (len(self.users) - 1)
+        print(f"Percentage of users that are in extended network: {friend_coverage * 100: 0.1f}%")
 
-        #figure average of path lengths to get average degrees of separation
+        # Figure average of path lengths to get average degrees of separation (subtract one to not count user)
+        total_length = 0
+        for path in visited.values():
+            total_length += len(path) - 1
 
-
+        if len(visited) > 1:
+            avg_separation = total_length / (len(visited) - 1)
+            print(f"Average degree of separation: {avg_separation}")
+        else:
+            print("No friends")
 
         return visited
 
 
+
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(10, 2)
-    print(sg.friendships)
+    sg.populate_graph(1000, 5)
+    #print(sg.friendships)
+    #print("\n")
     connections = sg.get_all_social_paths(1)
-    print(connections)
+    #print(connections)
