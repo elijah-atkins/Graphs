@@ -1,5 +1,6 @@
 
 # Note: This Queue class is sub-optimal. Why?
+
 class Queue():
     def __init__(self):
         self.queue = []
@@ -7,6 +8,7 @@ class Queue():
         self.queue.append(value)
     def dequeue(self):
         if self.size() > 0:
+            #this is using a list with a runtime O(n) double ended queue is faster
             return self.queue.pop(0)
         else:
             return None
